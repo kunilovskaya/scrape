@@ -1,28 +1,32 @@
 # scrape
-collect parallel texts from the web
+updated: March 25, 2020
 
-bbc_scraper and process_bbc-scrape are scripts which collect sources and targets from bbc.com
-start page
-http://www.bbc.com/russian/ искать по фразе Прочитать оригинал 
-goo.gl/gYD4nF
+collect parallel texts from the web
+https://www.bbc.com/russian/ is used as an example
+
+bbc_scraper and process_bbc-scrape are scripts which collect sources and targets from bbc.com/russian/ initial search result for query "Прочитать оригинал"
+
+To get first results page
+(1) go to https://www.bbc.co.uk/ws/languages, select your language
+(2) test the query for a phrase like 'Read the original/Puede leer el artículo original' in that language
+For example for Spanish the start page is https://www.bbc.com/mundo, the query above returns a page with 64 results:
+Su búsqueda de "Puede leer el artículo original" dio 64 resultados
+For Russian (https://www.bbc.com/russian/): Поиск по запросу "Прочитать оригинал": 1719 результатов
 
 These scripts solve the tasks:
-1) найти и сохранить название перевода, ссылку на него со страницы результатов поиска и дату 
-2) перейти на след страницу результатов (находит 351 перевод) 
+1) iterate search results pages to get the titles of the translations, the links to each of them and the publication dates 
+2) from each search result (hit) exptact the link to the source text
+3) go to the source text page, and if it is available, extract the source text and the target text
+4) add unique identifiers to the text pair (en_207.txt, ru_207.txt) and lose all boilerplate and save the clean texts to the folders
+5) create the corpus contents info table that contains:
+- source filename
+- source title
+- source url
+- source Year
+- target Title
+- target url
+- translation domain
 
-3) из каждого результата поиска (hit) извлечь <p> содержащий ссылку на оригинал
-4) перейти на страницу оригинала, если она доступна и извлечь текст оригинала и соответствующий текст перевода, 
-присвоив им уникальные имена, начиная с en_207ж сохранить в папку проекта
-
-5) напечатать таблицу, содержащую
-Source filename
-Source title
-Source url
-Source Year
-Target Title
-Target url
-Translation Domain
-
-based on scrapy tutorials
+partly based on scrapy tutorials
 https://www.digitalocean.com/community/tutorials/how-to-crawl-a-web-page-with-scrapy-and-python-3
 https://www.analyticsvidhya.com/blog/2017/07/web-scraping-in-python-using-scrapy/
