@@ -1,13 +1,19 @@
-import os, sys
-import scrapy
-import requests
+'''
+mkunilovskaya
+updated: March 25, 2020
+
+this is the second script which finishes the bbc.com scraping job:
+(1) it reads the binary file with data on all targets created by scraper;
+(2) increamentally adds data about respective sources and
+(3) writes texts to files; and (4) creates the corpus description table
+
+USAGE:
+'''
+import os
 from bs4 import BeautifulSoup
-import re
-from collections import defaultdict
 import requests, justext
 import pickle
 
-# this is the second script which finishes the bbc.com scraping job: it (1) reads the binary file with data on all targets created by scraper; (2) increamentally adds data about respective sources and (3) writes texts to files; and (4) creates the corpus description table
 
 def write_txt(fname, url, lang):
     # 1) get text data & 2) write text data to the file
@@ -27,7 +33,7 @@ class item: # create a structure with named fields
     url_ru = ''
     dom_ru = ''
 
-def do_something(lst):
+def scrape_it(lst):
     kk = 0
     try:
         for itm in lst:
@@ -66,24 +72,30 @@ def do_something(lst):
             if tit_en is not None:
                 itm.tit_en = tit_en.text  # tit_en.replace('<title>','')##.replace('</title>','')
 
-            with open('list.bin', 'wb') as f:
+            with open('list1.bin', 'wb') as f:
                 pickle.dump(lst, f)
 
     except:
         print('err')
 
 lst = []
-with open('list.bin', 'rb') as f:
+# create folders for the output
+en_outto = 'en/'
+os.makedirs(en_outto, exist_ok=True)
+ru_outto = 'ru/'
+os.makedirs(ru_outto, exist_ok=True)
+
+with open('list0.bin', 'rb') as f:
     lst = pickle.load(f)
 
 print(len(lst))
 
 # находим ссылку на оригинал
-do_something(lst)
+scrape_it(lst)
 
-print("TESTLIST=======================================", len(lst))
+print("TESTLIST:", len(lst))
 
-with open('_list.txt', 'w') as ofile:
+with open('corpus_description.tsv', 'w') as ofile:
     n = len(lst)
     for k in range(n):
         itm = lst[k]
@@ -95,16 +107,17 @@ with open('_list.txt', 'w') as ofile:
         if itm.url_ru is None or len(itm.url_ru) == 0:
             print('url_ru is empty')
             continue
+        # add k + N if you have a continuing collection and need to start counting from 207 for example
+        # the can be gaps in the file identifiers due to failures to extract either source or target
+        fname_en = 'en_{0}.txt'.format(k)
+        fname_ru = 'ru_{0}.txt'.format(k)
 
-        fname_en = 'en_{0}.txt'.format(k + 207)
-        fname_ru = 'ru_{0}.txt'.format(k + 207)
-
-        print("++++++++++++++++++++++++++++++++++++", itm.url_en, '\n')
+        print("+++", itm.url_en, '\n')
         try:
-            write_txt(fname_ru, itm.url_ru, 'Russian')
-            write_txt(fname_en, itm.url_en, 'English')
+            write_txt(ru_outto + fname_ru, itm.url_ru, 'Russian')
+            write_txt(en_outto + fname_en, itm.url_en, 'English')
         except:
-            print("BOOOOOOOOOOOOOOOOOOOOOOOOOM", itm.url_en, '\n')
+            print("BOOOOOOM", itm.url_en, '\n')
             continue
 
         s = '{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}'.format(fname_en, itm.tit_en, itm.url_en, itm.dt_en, itm.tit_ru,
