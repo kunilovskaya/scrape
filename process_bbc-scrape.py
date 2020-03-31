@@ -5,9 +5,13 @@ updated: March 25, 2020
 this is the second script which finishes the bbc.com scraping job:
 (1) it reads the binary file with data on all targets created by scraper;
 (2) increamentally adds data about respective sources and
-(3) writes texts to files; and (4) creates the corpus description table
+(3) writes texts to files; and
+(4) creates the corpus description table
 
-USAGE:
+USAGE: python3 process_bbc-scrape.py
+Comments:
+-- it assumes that the temporary file (list0.bin) produces by bbc_scraper is saved to the same folder as this script (default behavior)
+-- if updates the list0.bin and saves another temporary file list1.bin
 '''
 import os
 from bs4 import BeautifulSoup
@@ -78,6 +82,7 @@ def scrape_it(lst):
     except:
         print('err')
 
+#### MAIN CODE ####
 lst = []
 # create folders for the output
 en_outto = 'en/'
@@ -90,7 +95,7 @@ with open('list0.bin', 'rb') as f:
 
 print(len(lst))
 
-# находим ссылку на оригинал
+# find the link to the source
 scrape_it(lst)
 
 print("TESTLIST:", len(lst))

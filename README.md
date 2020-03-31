@@ -27,6 +27,15 @@ These scripts solve the tasks:
 - target url
 - translation domain
 
+**How to use**
+1. install python libraries: scrapy, pickle, requests, justext, bs4
+1. go to [https://www.bbc.co.uk/ws/languages](https://www.bbc.co.uk/ws/languages), select your language
+2. test the query for a phrase like 'Read the original/Puede leer el artículo original' in that language
+3. supply the link to the search results page to start_urls (line 36 in bbc_scraper.py)
+4. run the first script: $ scrapy runspider bbc_scraper.py
+5. adjust output folder names in process_bbc-scrape.py (lines 88-90)
+6. run the second script: $ python3 process_bbc-scrape.py
+
 partly based on scrapy tutorials
 https://www.digitalocean.com/community/tutorials/how-to-crawl-a-web-page-with-scrapy-and-python-3
 https://www.analyticsvidhya.com/blog/2017/07/web-scraping-in-python-using-scrapy/
