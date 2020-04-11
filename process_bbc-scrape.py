@@ -20,13 +20,20 @@ import pickle
 
 
 def write_txt(fname, url, lang):
-    # 1) get text data & 2) write text data to the file
+    # 1) get text data & 2) write text data to the file if longer than 400 wds
+    wc = 0
+    text = []
     with open(fname, 'w') as outfile:
         response = requests.get(url)
         paragraphs = justext.justext(response.content, justext.get_stoplist(lang))
         for paragraph in paragraphs:
             if not paragraph.is_boilerplate:
-                outfile.write(paragraph.text + '\n')
+                words = len(paragraph.text.split())
+                wc += words
+                text.append(paragraph.text)
+        if wc > 400:
+            for i in text:
+                outfile.write(i.strip() + '\n')
 
 class item: # create a structure with named fields
     fn_en = ''
@@ -40,7 +47,7 @@ class item: # create a structure with named fields
 def scrape_it(lst):
     kk = 0
     
-    for idx, itm in enumerate(lst):
+    for itm in lst:
         try:
             # adding urls for English sources
             kk += 1
