@@ -19,7 +19,7 @@ import requests, justext
 import pickle
 
 
-def write_txt(fname, url, lang):
+def write_txt(fname, url, lang, no_limit=False):
     # 1) get text data & 2) write text data to the file if longer than 400 wds
     wc = 0
     text = []
@@ -31,7 +31,10 @@ def write_txt(fname, url, lang):
                 words = len(paragraph.text.split())
                 wc += words
                 text.append(paragraph.text)
-        if wc > 400:
+        if no_limit == False and wc > 400:
+            for i in text:
+                outfile.write(i.strip() + '\n')
+        elif no_limit == True:
             for i in text:
                 outfile.write(i.strip() + '\n')
 
@@ -130,8 +133,9 @@ with open('corpus_description.tsv', 'w') as ofile:
 
         # print("+++", itm.url_en, '\n')
         try:
-            write_txt(ru_outto + fname_ru, itm.url_ru, 'Russian')
-            write_txt(en_outto + fname_en, itm.url_en, 'English')
+            source = write_txt(en_outto + fname_en, itm.url_en, 'English')
+            if source:
+                write_txt(ru_outto + fname_ru, itm.url_ru, 'Russian', no_limit=True)
             pairs += 1
             
         except Exception as e:
