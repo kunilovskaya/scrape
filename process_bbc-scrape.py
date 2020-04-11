@@ -39,13 +39,10 @@ class item: # create a structure with named fields
 
 def scrape_it(lst):
     kk = 0
-    try:
-        for itm in lst:
-            print('itm', kk)
-
-            if itm.url_en is not None and len(itm.url_en)>0:
-                continue
-
+    
+    for idx, itm in enumerate(lst):
+        try:
+            # adding urls for English sources
             kk += 1
             ru_page = requests.get(itm.url_ru)
 
@@ -58,10 +55,11 @@ def scrape_it(lst):
                         itm.url_en = first_link.get('href')
                         break
 
-            if itm.url_en is None or len(itm.url_en)==0:
-                print('url_en is empty')
+            if itm.url_en is None or len(itm.url_en) == 0: # no English source found!
+                print('=url_en is empty')
                 continue
-
+            
+            # however, if we do have the source text:
             en_page = requests.get(itm.url_en)
 
             urlsoup1 = BeautifulSoup(en_page.content, "html.parser")
@@ -72,18 +70,21 @@ def scrape_it(lst):
                 itm.dt_en = dt_en.text
 
             tit_en = urlsoup1.find('title')
-            # print("---------------", tit_en)
+
             if tit_en is not None:
                 itm.tit_en = tit_en.text  # tit_en.replace('<title>','')##.replace('</title>','')
 
             with open('list1.bin', 'wb') as f:
                 pickle.dump(lst, f)
 
-    except:
-        print('err')
+        except Exception as e:
+            print(e)
+            print('err', kk)
+            continue # go to the next item
 
 #### MAIN CODE ####
 lst = []
+pairs = 0
 # create folders for the output
 en_outto = 'en/'
 os.makedirs(en_outto, exist_ok=True)
@@ -93,12 +94,10 @@ os.makedirs(ru_outto, exist_ok=True)
 with open('list0.bin', 'rb') as f:
     lst = pickle.load(f)
 
-print(len(lst))
+print("Number of search results to process:", len(lst))
 
-# find the link to the source
+# this enriches our binary data with the links to sources
 scrape_it(lst)
-
-print("TESTLIST:", len(lst))
 
 with open('corpus_description.tsv', 'w') as ofile:
     n = len(lst)
@@ -117,16 +116,25 @@ with open('corpus_description.tsv', 'w') as ofile:
         fname_en = 'en_{0}.txt'.format(k)
         fname_ru = 'ru_{0}.txt'.format(k)
 
-        print("+++", itm.url_en, '\n')
+        bits = itm.url_en.split('/')
+        for bit in bits:
+            if bit.startswith('20'):
+                enurl_date = bit.split('-')[0]
+
+        # print("+++", itm.url_en, '\n')
         try:
             write_txt(ru_outto + fname_ru, itm.url_ru, 'Russian')
             write_txt(en_outto + fname_en, itm.url_en, 'English')
-        except:
+            pairs += 1
+            
+        except Exception as e:
+            print(e)
             print("BOOOOOOM", itm.url_en, '\n')
             continue
 
-        s = '{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}'.format(fname_en, itm.tit_en, itm.url_en, itm.dt_en, itm.tit_ru,
-                                                       itm.url_ru, itm.dom_ru)
+        s = '{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}'.format(fname_en.strip(), itm.tit_en.strip(), itm.url_en.strip(), enurl_date.strip(), itm.dt_en.strip(), itm.tit_ru.strip(),
+                                                       itm.url_ru.strip(), itm.dom_ru.strip())
         ofile.write(s + '\n')
-print(len(lst))
+        
+print('Extracted text pairs:', pairs)
 

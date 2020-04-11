@@ -32,7 +32,7 @@ class item: # create a structure with named fields
 
 class bbcSpider(scrapy.Spider):
     name = "bbc_spider"
-    # the page https://www.bbc.com/russian/ with initial search results for query "See source":
+    # the page https://www.bbc.com/russian/ with initial search results for query "See source" in Russian:
     start_urls = ['https://www.bbc.com/russian/search?q=%D0%9F%D1%80%D0%BE%D1%87%D0%B8%D1%82%D0%B0%D1%82%D1%8C+%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB']
     USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1'
     lst_full = []
@@ -70,7 +70,7 @@ class bbcSpider(scrapy.Spider):
         # feeding more pages to parse
         NEXT_PAGE_SELECTOR = '.ws-search-pagination a ::attr(href)'
         next_page = response.css(NEXT_PAGE_SELECTOR).extract()
-        # print("NEXTPAGE=====", next_page)
+        print("NEXTPAGE=====", next_page)
         
         if next_page:
             yield scrapy.Request(
@@ -84,5 +84,5 @@ class bbcSpider(scrapy.Spider):
         lst = self.lst_full
         print(len(lst))
 
-        with open('list0.bin', 'wb') as f: # the output is saved to the working folder, i.e. the folder from which you start the script
-            pickle.dump(lst, f)
+        with open('list0.bin', 'wb') as out0: # the output is saved to the working folder, i.e. the folder from which you start the script
+            pickle.dump(lst, out0)

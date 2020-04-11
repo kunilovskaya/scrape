@@ -6,6 +6,8 @@ __pycache__/
 # output files
 list0.bin
 list1.bin
+list00.bin
+list11.bin
 en/
 ru/
 # C extensions
